@@ -8,6 +8,7 @@ import Url.Builder as Url
 
 -- MAIN
 
+-- Load the app into a browser context
 main =
   Browser.element
     { init = init
@@ -18,6 +19,7 @@ main =
 
 -- MODEL
 
+-- This is similar to a redux store
 type alias Model =
   { topic : String
   , url : String
@@ -26,20 +28,19 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   ( Model "cat" "waiting.gif"
-  , getRandomGif "cat"
+  , getRandomGif "cat" ???
   )
 
 -- UPDATE
 
 type Msg
-  = MorePlease
+  = FetchNewGif
   | NewGif (Result Http.Error String)
-  | NewTopic String
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    MorePlease ->
+    FetchNewGif ->
       ( model
       , getRandomGif model.topic
       )
@@ -56,11 +57,6 @@ update msg model =
           , Cmd.none
           )
 
-    NewTopic newTopic ->
-      ( { model | topic = newTopic }
-      , Cmd.none
-      )
-
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
@@ -73,7 +69,7 @@ view : Model -> Html Msg
 view model =
     div []
     [ h2 [] [ text model.topic ]
-    , button [ onClick MorePlease ] [ text "New pic"]
+    , button [ onClick FetchNewGif ] [ text "New pic"]
     , input [ placeholder "Enter a Topic", onBlur NewTopic ] []
     , br [] []
     , img [ src model.url ] []
